@@ -20,11 +20,11 @@ Script de Python que analiza elementos SEO de páginas web y genera reportes en 
 ### 1. Instalar dependencias
 
 ```bash
-git cloe https://github.com/DanielTorres1/SEO-keyword-checker
+git clone https://github.com/DanielTorres1/SEO-keyword-checker.git
 cd SEO-keyword-checker
 python3 -m venv venv
 source venv/bin/activate
-pip install requests beautifulsoup4 openpyxl selenium webdriver-manager python-dotenv
+pip install -r requirements.txt
 ```
 
 ### 2. Configurar API Key (Opcional pero Recomendado)
