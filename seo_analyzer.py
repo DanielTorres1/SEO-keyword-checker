@@ -167,9 +167,19 @@ def get_pagespeed_insights(url, strategy='mobile', api_key=None, retry=False):
         
     except requests.RequestException as e:
         # Si es un error 429 (rate limiting), detener la ejecución
-        if hasattr(e, 'response') and e.response is not None and e.response.status_code == 429:
-            print(f"✗ Error: {e}")
-            raise Exception(f"Rate limiting detectado (429): Google PageSpeed API ha limitado las peticiones. Por favor espera un momento e intenta nuevamente, o considera usar una API key.") from e
+        if hasattr(e, 'response') and e.response is not None:
+            if e.response.status_code == 429:
+                print(f"✗ Error: Rate limiting (429)")
+                raise Exception(f"Rate limiting detectado (429): Google PageSpeed API ha limitado las peticiones. Por favor espera un momento e intenta nuevamente.") from e
+            elif e.response.status_code == 400:
+                # Reintentar una vez si no es un reintento ya
+                if not retry:
+                    print(f"✗ Error 400, reintentando...")
+                    time.sleep(5)  # Esperar 5 segundos antes de reintentar
+                    return get_pagespeed_insights(url, strategy, api_key, retry=True)
+                else:
+                    print(f"✗ Error 400 persistente: URL no analizable por PageSpeed")
+                    return {'accessibility': None, 'performance': None}
         print(f"✗ Error: {e}")
         return {'accessibility': None, 'performance': None}
     except Exception as e:
@@ -448,17 +458,25 @@ Ejemplos de uso:
     print("  ANALIZADOR SEO - Verificación de Keywords")
     print("=" * 60)
     
+    # Validar que existe API key
+    if not api_key:
+        print("\n✗ ERROR: No se encontró API key de Google PageSpeed Insights")
+        print("\nPara usar este script necesitas una API key. Tienes dos opciones:\n")
+        print("1. Crear un archivo .env con tu API key:")
+        print("   API_KEY=tu_api_key_aqui\n")
+        print("2. Usar el argumento --api-key:")
+        print(f"   python {sys.argv[0]} --api-key TU_API_KEY\n")
+        print("Consigue una API key gratis en:")
+        print("https://developers.google.com/speed/docs/insights/v5/get-started")
+        sys.exit(1)
+    
     print(f"\nCargando configuración desde: {args.config_file}")
     config = load_config(args.config_file)
     
     print(f"URLs a analizar: {len(config)}")
     if include_pagespeed:
         print("PageSpeed Insights: ACTIVADO")
-        if api_key:
-            print("  └─ Usando API key (sin límites de tasa)")
-        else:
-            print("  └─ Sin API key (puede ser lento, límites de tasa aplicados)")
-            print("  └─ Consigue una API key gratis: https://developers.google.com/speed/docs/insights/v5/get-started")
+        print("  └─ Usando API key ✓")
     else:
         print("PageSpeed Insights: DESACTIVADO")
     print()
