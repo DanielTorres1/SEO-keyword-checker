@@ -166,6 +166,10 @@ def get_pagespeed_insights(url, strategy='mobile', api_key=None, retry=False):
         }
         
     except requests.RequestException as e:
+        # Si es un error 429 (rate limiting), detener la ejecución
+        if hasattr(e, 'response') and e.response is not None and e.response.status_code == 429:
+            print(f"✗ Error: {e}")
+            raise Exception(f"Rate limiting detectado (429): Google PageSpeed API ha limitado las peticiones. Por favor espera un momento e intenta nuevamente, o considera usar una API key.") from e
         print(f"✗ Error: {e}")
         return {'accessibility': None, 'performance': None}
     except Exception as e:
