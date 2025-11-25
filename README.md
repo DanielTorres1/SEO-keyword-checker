@@ -42,30 +42,13 @@ API_KEY=tu_api_key_aqui
 
 ## 💡 Uso
 
-### Análisis completo (con PageSpeed)
-```bash
-python seo_analyzer.py
-```
-> Si configuraste `.env` con tu API key, se usará automáticamente.
-
-### Solo análisis SEO (sin PageSpeed, más rápido)
-```bash
-python seo_analyzer.py --no-pagespeed
-```
-
-### Con API key en línea de comandos (sobrescribe .env)
-```bash
-python seo_analyzer.py --api-key TU_API_KEY
-```
-
 ### Archivo de configuración personalizado
 ```bash
 python seo_analyzer.py --config-file mi_config.json
 ```
-
-### Combinando opciones
+### Solo análisis SEO (sin PageSpeed, más rápido)
 ```bash
-python seo_analyzer.py --config-file sites.json --api-key TU_API_KEY
+python seo_analyzer.py -config-file site.json --no-pagespeed
 ```
 
 ## 🔑 Obtener API Key de Google (Gratis)
